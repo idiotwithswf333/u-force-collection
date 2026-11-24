@@ -7,7 +7,7 @@ if not exist "%DKP%\msys2\usr\bin\bash.exe" (
   exit /b 1
 )
 set "PROJ=%~dp0"
-"%DKP%\msys2\usr\bin\bash.exe" -lc "cd \"$(cygpath -u \"$PROJ\")\" && (pacman -S --needed --noconfirm wut wut-tools ; make)"
+"%DKP%\msys2\usr\bin\bash.exe" -lc "cd \"$(cygpath -u \"$PROJ\")\" && (pacman -S --needed --noconfirm wut wut-tools wiiu-sdl2 ; make)"
 echo.
 if exist msfc_wiiu.wuhb (echo Built: %~dp0msfc_wiiu.wuhb) else (echo Build failed - see messages above.)
 pause
