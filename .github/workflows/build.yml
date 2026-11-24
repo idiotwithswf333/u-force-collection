@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install wut
-        run: dkp-pacman -Syu --noconfirm wut wut-tools
+        run: dkp-pacman -Syu --noconfirm wut wut-tools wiiu-sdl2
 
       - name: Build
         run: make
