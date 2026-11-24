@@ -39,7 +39,7 @@ $(TARGET).elf: $(OBJ)
 	$(CC) $(OBJ) $(LDFLAGS) $(LIBS) -o $@
 
 $(TARGET).rpx: $(TARGET).elf
-	elf2rpx $< $@
+	elf2rpl $< $@
 
 $(TARGET).wuhb: $(TARGET).rpx $(ICON)
 	wuhbtool $(TARGET).rpx $@ --name="$(APP_NAME)" --short-name="$(APP_SHORT)" \
