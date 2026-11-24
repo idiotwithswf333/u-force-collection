@@ -1,0 +1,26 @@
+name: Build WUHB
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitppc:latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install wut
+        run: dkp-pacman -Syu --noconfirm wut wut-tools
+
+      - name: Build
+        run: make
+
+      - name: Upload WUHB
+        uses: actions/upload-artifact@v4
+        with:
+          name: msfc_wiiu
+          path: |
+            msfc_wiiu.wuhb
+            msfc_wiiu.rpx
