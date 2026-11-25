@@ -25,7 +25,7 @@
 
 #define SCREEN_W 1280
 #define SCREEN_H 720
-#define TITLE    "Mighty Switch Force! Collection (Wii U) - stage 1.5"
+#define TITLE    "Mighty Switch Force! Collection (Wii U) - stage 1.5 (build 2)"
 
 /* ---- logging: in-memory buffer, saved to the log file once it is known --- */
 
@@ -301,14 +301,26 @@ int main(int argc, char **argv)
     (void)argc; (void)argv;
 
     LOG(TITLE);
+    LOG("boot: started");
+    /* SD card + log file first, so everything below is recorded even if it crashes */
+    load_step();
+    load_step();
+    LOG("boot: SD and log ready, starting SDL");
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS) != 0) {
         LOG("SDL_Init failed: %s", SDL_GetError());
         headless = 1;
     } else {
+        LOG("SDL_Init ok");
+        start_music();                 /* music before anything else is set up */
+        LOG("creating window");
         win = SDL_CreateWindow("MSFC", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
                                SCREEN_W, SCREEN_H, 0);
-        if (win) ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        LOG("window: %s", win ? "ok" : "FAILED");
+        if (win) {
+            LOG("creating renderer");
+            ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+        }
         if (!ren) {
             LOG("window/renderer failed: %s", SDL_GetError());
             headless = 1;
@@ -321,9 +333,8 @@ int main(int argc, char **argv)
                 SDL_Surface *s = SDL_LoadBMP_RW(
                     SDL_RWFromConstMem(msfc_splash_bmp, (int)(msfc_splash_bmp_end - msfc_splash_bmp)), 1);
                 if (s) { tex = SDL_CreateTextureFromSurface(ren, s); SDL_FreeSurface(s); }
-                else LOG("splash image failed: %s", SDL_GetError());
+                LOG("splash image: %s", tex ? "ok" : SDL_GetError());
             }
-            start_music();
         }
     }
 
@@ -336,6 +347,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
+    LOG("main loop starting");
     while (running) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
@@ -345,9 +357,11 @@ int main(int argc, char **argv)
         shown += (L.target - shown) * 0.08f;
         if (L.target - shown < 0.002f) shown = L.target;
         draw(ren, tex, shown, L.failed, frame);
+        if (frame == 120) LOG("frame 120 reached (screen is updating)");
         frame++;
     }
 
+    LOG("main loop ended, shutting down");
     if (g_audioDev) SDL_CloseAudioDevice(g_audioDev);
     if (tex) SDL_DestroyTexture(tex);
     SDL_DestroyRenderer(ren);

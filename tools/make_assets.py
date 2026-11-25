@@ -7,7 +7,7 @@ Needs Pillow and ffmpeg. Produces:
   meta/tv.png       1280x720 boot splash shown by the Wii U on the TV
   meta/drc.png      854x480  boot splash shown on the GamePad
   meta/splash.bmp   1280x720 24-bit BMP, embedded in the app (in-app loading screen)
-  meta/loading.wav  48 kHz stereo IMA-ADPCM, embedded in the app (loading music)
+  meta/loading.wav  first 40 s of the song with a 4 s fade-out, 48 kHz stereo IMA-ADPCM, embedded in the app
 """
 import subprocess, sys
 from PIL import Image
@@ -20,6 +20,6 @@ im = Image.open(img).convert("RGB").resize((1280, 720), Image.LANCZOS)
 im.save("meta/tv.png")
 im.resize((854, 480), Image.LANCZOS).save("meta/drc.png")
 im.save("meta/splash.bmp")
-subprocess.check_call(["ffmpeg", "-v", "error", "-y", "-i", song, "-vn", "-ac", "2", "-ar", "48000",
+subprocess.check_call(["ffmpeg", "-v", "error", "-y", "-i", song, "-vn", "-t", "40", "-af", "afade=t=out:st=36:d=4", "-ac", "2", "-ar", "48000",
                        "-c:a", "adpcm_ima_wav", "-block_size", "1024", "meta/loading.wav"])
 print("done")

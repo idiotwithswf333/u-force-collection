@@ -6,8 +6,15 @@ Stage 1.5 adds a proper loading experience on top of the stage 1 launcher:
   and `meta/drc.png` (854x480) are passed to `wuhbtool`.
 * **In-app loading screen**: the artwork full screen with a fade-in and a
   progress bar, while the song plays. The image (`meta/splash.bmp`) and the
-  music (`meta/loading.wav`, IMA-ADPCM) are compiled into the app.
+  music (`meta/loading.wav`: first 40 s of the song, 4 s fade-out, IMA-ADPCM) are
+  compiled into the app. The music starts as the very first thing the app does.
 * The stage 1 checks still run behind it and write `sd:/MSFC/msfc_wiiu.log`.
+  The SD card and log are set up first, then every step (SDL, audio, window,
+  renderer) is logged as it happens, so a crash leaves the last step in the log.
+
+Note: the Wii U's own boot sound (`bootSound.btsnd`, max 6 s) exists for installed
+titles, but WUHB/wuhbtool has no slot for it, so music can only start once the
+app itself starts.
 
 ## Build on Windows (devkitPro installed)
 Double-click `build.bat` (edit `DKP` inside if devkitPro is not in `C:\devkitPro`).
